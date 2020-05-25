@@ -17,10 +17,10 @@
     }
 
     #india {
-      fill: steelblue;
-      opacity: .8;
+      fill: #fff;
+      opacity: 1;
       stroke: #000000;
-      stroke-width: .7;
+      stroke-width: .6;
     }
   </style>
 </head>
@@ -43,7 +43,11 @@
 
     var map = svg.append("svg:g")
 
-
+    // var _zoom = d3.behavior.zoom()
+    //   .scaleExtent([1 / 2, 8])
+    //   .on("zoom", function () {
+    //     g.attr("transform", d3.event.transform);
+    //   });
     var india = map.append("svg:g")
       .attr("id", "india");
     let areaMap = new Map()
@@ -55,38 +59,67 @@
       }
     });
     let unidentifiedPlaces = [];
-    d3.json("data/full_data-1.json", function (json) {
+    d3.json("data/states_india.json", function (data) {
+      india.selectAll("path").data(data.features)
+        .enter()
+        .append('path')
+        .attr("class", "subunit")
+        .attr("d", path)
+        .style("stroke", "black")
+        .style("opacity", "1")
+        .style("stroke-width", "1px");
+    });
+    d3.json("data/districts_india.json", function (json) {
       india.selectAll("path")
         .data(json.features)
         .enter().append("path")
-        .attr("d", path)
+        .style("stroke", "#e4e4e4")
+        .style("opacity", "0.4")
+        .style("stroke-width", "0.5px")
         .attr("fill", (d) => {
           if (areaMap.has(d.properties.NAME_2)) {
             return areaMap.get(d.properties.NAME_2);
           } else {
-            console.log("called");
-            unidentifiedPlaces.push(d.properties.NAME_2+"-test");
+            unidentifiedPlaces.push(d.properties.NAME_2 + "-test");
             return "black";
           }
         })
+        .attr("d", path)
         .append("title")
         .text(function (d) {
           return "district : " + d.properties.NAME_2 + " " + " state : " + d.properties.NAME_1;
         });
+      // svg.call(_zoom);
     });
-    setTimeout(()=>{
+
+    setTimeout(() => {
       console.log(unidentifiedPlaces);
 
-    },1000);
+    }, 1000);
 
 
 
     function initialize() {
       proj.scale(6700);
       proj.translate([-1240, 750]);
+      // proj.fitExtent([[20, 20], [940, 480]], nj);
     }
 
+// // draw the map of Poland
+// var poland = layer1.append("g")
+// .data(values[0].features.filter(function(d){return d.properties.Name=="Poland"}))
+// .enter()
+// .append("path")
+// .attr("class","poland")
+// .attr("d", path);
 
+// // draw the Polish regions
+// var regions = layer1.append("g")
+// .data([values[1]])
+// .enter()
+// .append("path")
+// .attr("class","regions")
+// .attr("d", path);
 
 
   </script>
